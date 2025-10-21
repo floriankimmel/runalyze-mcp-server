@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { McpModule, McpTransportType } from '@rekog/mcp-nest';
 import { RunalyzeHrvTool } from './tools/runalyze-hrv.tool';
+import { RunalyzeSleepTool } from './tools/runalyze-sleep.tool';
+import { RunalyzeHeartRateRestTool } from './tools/runalyze-heart-rate-rest.tool';
 import configuration from './config/configuration';
 
 @Module({
@@ -19,6 +21,6 @@ import configuration from './config/configuration';
       transport: McpTransportType.STDIO,
     }),
   ],
-  providers: [RunalyzeHrvTool],
+  providers: [RunalyzeHrvTool, RunalyzeSleepTool, RunalyzeHeartRateRestTool],
 })
 export class AppModule {}

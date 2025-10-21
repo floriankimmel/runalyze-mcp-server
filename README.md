@@ -1,8 +1,8 @@
 # 🏃 Runalyze MCP Server
 
-> Access your Runalyze HRV data through AI assistants using the Model Context Protocol (MCP)
+> Access your Runalyze health metrics through AI assistants using the Model Context Protocol (MCP)
 
-A secure MCP server that lets you retrieve Heart Rate Variability (HRV) data from your Runalyze account directly within AI chat applications like Claude Desktop and ChatGPT Desktop.
+A secure MCP server that lets you retrieve health data (HRV, Sleep, Resting Heart Rate) from your Runalyze account directly within AI chat applications like Claude Desktop and ChatGPT Desktop.
 
 ---
 
@@ -27,11 +27,12 @@ A secure MCP server that lets you retrieve Heart Rate Variability (HRV) data fro
 
 ## 🤔 What is this?
 
-This MCP server allows AI assistants to retrieve your Heart Rate Variability (HRV) data from Runalyze. Once configured, you can ask questions like:
+This MCP server allows AI assistants to retrieve health metrics from Runalyze. Once configured, you can ask questions like:
 
 - "What's my latest HRV data?"
-- "Show me my HRV measurements from last week"
-- "Analyze my HRV trends"
+- "Show me my sleep data from last week"
+- "What was my resting heart rate this morning?"
+- "Analyze my HRV trends over the past month"
 
 The AI will automatically fetch your data and provide insights!
 
@@ -39,7 +40,7 @@ The AI will automatically fetch your data and provide insights!
 
 - **Node.js** v18 or higher ([Download here](https://nodejs.org/))
 - **Yarn** package manager ([Installation guide](https://yarnpkg.com/getting-started/install))
-- A **Runalyze account** with premium access (for HRV API access)
+- A **Runalyze account** with premium access (for API access)
 - An **AI assistant** that supports MCP (Claude Desktop, ChatGPT Desktop, etc.)
 
 ## 📥 Installation
@@ -187,11 +188,11 @@ yarn build
 
 ## 🚀 Usage
 
-Once configured, you can use the following tool in your AI assistant:
+Once configured, you can use the following tools in your AI assistant:
 
 ### `get-runalyze-hrv-data`
 
-Retrieves HRV data from your Runalyze account.
+Retrieves Heart Rate Variability (HRV) data from your Runalyze account.
 
 **Parameters:**
 - `page` (optional): Page number for pagination (default: 1)
@@ -205,6 +206,42 @@ Retrieves HRV data from your Runalyze account.
 - HRV measurement ID
 - Date and time of measurement
 - Metric value (e.g., RMSSD)
+- Measurement type
+
+### `get-runalyze-sleep-data`
+
+Retrieves sleep data from your Runalyze account.
+
+**Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+
+**Example prompts:**
+- "Get my sleep data from Runalyze"
+- "Show me my sleep patterns for the last month"
+- "How many hours did I sleep last week?"
+
+**Response includes:**
+- Sleep measurement ID
+- Date and time
+- Metric value (e.g., hours slept)
+- Measurement type
+
+### `get-runalyze-heart-rate-rest-data`
+
+Retrieves resting heart rate data from your Runalyze account.
+
+**Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+
+**Example prompts:**
+- "Get my resting heart rate data"
+- "What was my resting heart rate this morning?"
+- "Show me my resting heart rate trend over the past week"
+
+**Response includes:**
+- Resting heart rate measurement ID
+- Date and time
+- Metric value (beats per minute)
 - Measurement type
 
 ## 🔒 Security Notes
@@ -226,7 +263,7 @@ Retrieves HRV data from your Runalyze account.
 - Double-check your MCP client configuration
 
 ### No data returned
-- Ensure you have HRV data in your Runalyze account
+- Ensure you have the relevant health data in your Runalyze account
 - Check that your account has premium/supporter access (required for API access)
 - Verify your API token has the necessary permissions
 
@@ -273,20 +310,24 @@ Output will be in the `dist/` directory.
 runalyze-mcp-server/
 ├── src/
 │   ├── config/
-│   │   └── configuration.ts      # Configuration with Zod validation
+│   │   └── configuration.ts                    # Configuration with Zod validation
 │   ├── tools/
-│   │   ├── __tests__/            # Co-located tests
-│   │   │   └── runalyze-hrv.tool.integration.ts
-│   │   └── runalyze-hrv.tool.ts  # HRV data retrieval tool
-│   ├── app.module.ts             # Root module
-│   └── main.ts                   # Application entry point (STDIO mode)
-├── dist/                         # Compiled output (generated)
-├── coverage/                     # Test coverage reports (generated)
-├── .eslintrc.js                  # ESLint configuration
-├── .prettierrc                   # Prettier configuration
-├── jest.config.js                # Jest configuration
-├── tsconfig.json                 # TypeScript configuration
-└── package.json                  # Dependencies and scripts
+│   │   ├── __tests__/                          # Co-located tests
+│   │   │   ├── runalyze-hrv.tool.integration.ts
+│   │   │   ├── runalyze-sleep.tool.integration.ts
+│   │   │   └── runalyze-heart-rate-rest.tool.integration.ts
+│   │   ├── runalyze-hrv.tool.ts                # HRV data retrieval tool
+│   │   ├── runalyze-sleep.tool.ts              # Sleep data retrieval tool
+│   │   └── runalyze-heart-rate-rest.tool.ts    # Resting heart rate tool
+│   ├── app.module.ts                           # Root module
+│   └── main.ts                                 # Application entry point (STDIO mode)
+├── dist/                                       # Compiled output (generated)
+├── coverage/                                   # Test coverage reports (generated)
+├── .eslintrc.js                                # ESLint configuration
+├── .prettierrc                                 # Prettier configuration
+├── jest.config.js                              # Jest configuration
+├── tsconfig.json                               # TypeScript configuration
+└── package.json                                # Dependencies and scripts
 ```
 
 ## Testing
@@ -446,7 +487,12 @@ import { MyTool } from './tools/my-tool.tool';
     ConfigModule.forRoot({ ... }),
     McpModule.forRoot({ ... }),
   ],
-  providers: [RunalyzeHrvTool, MyTool], // Add here
+  providers: [
+    RunalyzeHrvTool,
+    RunalyzeSleepTool,
+    RunalyzeHeartRateRestTool,
+    MyTool, // Add your new tool here
+  ],
 })
 export class AppModule {}
 ```

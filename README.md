@@ -248,12 +248,14 @@ Retrieves HRV data from your Runalyze account.
 git clone https://github.com/floriankimmel/runalyze-mcp-server.git
 cd runalyze-mcp-server
 
-# Install dependencies
+# Install dependencies (this also sets up the pre-commit hook)
 yarn install
 
 # Start development server with hot-reload
 yarn start:dev
 ```
+
+**Note**: The `yarn install` command automatically sets up a pre-commit hook using Husky. This hook runs ESLint and Prettier on staged files before each commit to ensure code quality.
 
 ### Build
 
@@ -371,6 +373,16 @@ yarn lint:fix
 # Format code with Prettier
 yarn format
 ```
+
+### Pre-commit Hook
+
+The project uses Husky and lint-staged to enforce code quality. Before each commit:
+
+1. ESLint runs on staged TypeScript files and attempts to auto-fix issues
+2. Prettier formats the code
+3. If any errors remain, the commit is blocked
+
+This ensures only properly linted code is committed to the repository.
 
 ## Creating New Tools
 

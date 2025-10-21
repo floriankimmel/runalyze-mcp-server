@@ -86,7 +86,7 @@ describe('RunalyzeHrvTool', () => {
         method: 'GET',
         headers: {
           Accept: 'application/json',
-          Authorization: 'Bearer test-token',
+          token: 'test-token',
         },
       });
       expect(mockContext.reportProgress).toHaveBeenCalledTimes(4);

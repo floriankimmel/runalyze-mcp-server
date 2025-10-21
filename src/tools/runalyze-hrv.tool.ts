@@ -70,7 +70,7 @@ export class RunalyzeHrvTool {
         method: 'GET',
         headers: {
           Accept: 'application/json',
-          Authorization: `Bearer ${this.apiToken}`,
+          token: this.apiToken,
         },
       });
 

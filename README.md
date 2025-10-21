@@ -190,6 +190,49 @@ yarn build
 
 Once configured, you can use the following tools in your AI assistant:
 
+### `get-runalyze-activities`
+
+Retrieves a list of activities from your Runalyze account.
+
+**Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+
+**Example prompts:**
+- "Get my activities from Runalyze"
+- "Show me my recent workouts"
+- "What activities did I log this week?"
+
+**Response includes:**
+- Activity ID and title
+- Sport type and activity type
+- Date, time, and timezone information
+- Distance, duration, and elapsed time
+- Elevation data (up, down, climb score)
+- Heart rate metrics (avg, max, recovery)
+- VO2max estimates and training metrics
+- Power data (for cycling)
+- Running dynamics (cadence, vertical oscillation, ground contact time, etc.)
+- Cycling metrics (balance, torque effectiveness, pedal smoothness, etc.)
+- Weather conditions (temperature, wind, humidity, etc.)
+- Race results (if applicable)
+- Equipment and tags
+- Climb information
+
+### `get-runalyze-activity-detail`
+
+Retrieves detailed information for a specific activity by ID from your Runalyze account.
+
+**Parameters:**
+- `id` (required): The activity ID to retrieve
+
+**Example prompts:**
+- "Get details for activity 12345"
+- "Show me the full details of my run with ID 12345"
+- "What are the metrics for activity 12345?"
+
+**Response includes:**
+All the same detailed information as `get-runalyze-activities`, but for a single specific activity. This is useful when you know the activity ID and want complete details about that particular workout.
+
 ### `get-runalyze-hrv-data`
 
 Retrieves Heart Rate Variability (HRV) data from your Runalyze account.

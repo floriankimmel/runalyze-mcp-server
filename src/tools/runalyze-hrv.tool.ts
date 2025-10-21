@@ -5,12 +5,7 @@ import { z } from 'zod';
 import type { AppConfig } from '../config/configuration';
 
 const getHrvDataSchema = z.object({
-  page: z
-    .number()
-    .int()
-    .min(1)
-    .default(1)
-    .describe('The collection page number (default: 1)'),
+  page: z.number().int().min(1).default(1).describe('The collection page number (default: 1)'),
 });
 
 interface HrvDataItem {
@@ -44,11 +39,25 @@ export class RunalyzeHrvTool {
       'Retrieve HRV (Heart Rate Variability) data from the Runalyze API. Returns a collection of HRV measurements including date/time, metric values, and measurement types.',
     parameters: getHrvDataSchema,
   })
-  async getHrvData(
-    params: z.infer<typeof getHrvDataSchema>,
-    context: Context,
-  ): Promise<string> {
+  async getHrvData(params: z.infer<typeof getHrvDataSchema>, context: Context): Promise<string> {
     await context.reportProgress({ progress: 0, total: 100 });
+
+    // Check if API token is configured
+    if (!this.apiToken || this.apiToken.trim() === '') {
+      return JSON.stringify(
+        {
+          error: 'Configuration Error',
+          message:
+            'RUNALYZE_API_TOKEN is not configured. Please set the environment variable or add it to your MCP client configuration.',
+          instructions: {
+            step1: 'Get your API token from https://runalyze.com/settings/personal-api',
+            step2: 'Add RUNALYZE_API_TOKEN to your MCP client env configuration',
+          },
+        },
+        null,
+        2,
+      );
+    }
 
     try {
       const { page } = params;
@@ -121,8 +130,7 @@ export class RunalyzeHrvTool {
       return JSON.stringify(
         {
           error: 'Request Failed',
-          message:
-            error instanceof Error ? error.message : 'Unknown error occurred',
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
           details: String(error),
         },
         null,

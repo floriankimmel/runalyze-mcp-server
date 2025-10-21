@@ -82,16 +82,13 @@ describe('RunalyzeHrvTool', () => {
       expect(parsed.data).toEqual(mockData);
       expect(parsed.page).toBe(1);
       expect(parsed.totalItems).toBe(2);
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://runalyze.com/api/v1/metrics/hrv?page=1',
-        {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            Authorization: 'Bearer test-token',
-          },
+      expect(mockFetch).toHaveBeenCalledWith('https://runalyze.com/api/v1/metrics/hrv?page=1', {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer test-token',
         },
-      );
+      });
       expect(mockContext.reportProgress).toHaveBeenCalledTimes(4);
     });
 
@@ -266,6 +263,44 @@ describe('RunalyzeHrvTool', () => {
         progress: 100,
         total: 100,
       });
+    });
+
+    it('should return error when API token is not configured', async () => {
+      // Create a new tool instance without API token
+      const mockConfigServiceNoToken = {
+        get: jest.fn((key: string) => {
+          const config: Record<string, string> = {
+            'runalyze.apiToken': '',
+            'runalyze.baseUrl': 'https://runalyze.com',
+          };
+          return config[key];
+        }),
+      };
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          RunalyzeHrvTool,
+          {
+            provide: ConfigService,
+            useValue: mockConfigServiceNoToken,
+          },
+        ],
+      }).compile();
+
+      const toolNoToken = module.get<RunalyzeHrvTool>(RunalyzeHrvTool);
+
+      const result = await toolNoToken.getHrvData(
+        {
+          page: 1,
+        },
+        mockContext,
+      );
+
+      const parsed = JSON.parse(result);
+
+      expect(parsed.error).toBe('Configuration Error');
+      expect(parsed.message).toContain('RUNALYZE_API_TOKEN is not configured');
+      expect(parsed.instructions).toBeDefined();
     });
   });
 });

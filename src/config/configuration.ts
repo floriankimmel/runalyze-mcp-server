@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Define the configuration schema with validation
 const configSchema = z.object({
   runalyze: z.object({
-    apiToken: z.string().min(1, 'RUNALYZE_API_TOKEN is required'),
+    apiToken: z.string().default(''),
     baseUrl: z.string().url().default('https://runalyze.com'),
   }),
 });

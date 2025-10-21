@@ -48,7 +48,7 @@ The AI will automatically fetch your data and provide insights!
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/floriankimmel/runalyze-mcp-server.git
 cd runalyze-mcp-server
 
 # Install dependencies
@@ -245,7 +245,7 @@ Retrieves HRV data from your Runalyze account.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/floriankimmel/runalyze-mcp-server.git
 cd runalyze-mcp-server
 
 # Install dependencies

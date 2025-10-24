@@ -419,7 +419,7 @@ describe('RunalyzeActivitiesTool', () => {
 
       expect(parsed.error).toBe('Unauthorized');
       expect(parsed.status).toBe(401);
-      expect(parsed.message).toContain('Invalid API token');
+      expect(parsed.message).toContain('Invalid Runalyze API token');
     });
 
     it('should handle other HTTP errors', async () => {
@@ -691,8 +691,8 @@ describe('RunalyzeActivitiesTool', () => {
 
       const parsed = JSON.parse(result);
 
-      expect(parsed.error).toBe('Configuration Error');
-      expect(parsed.message).toContain('RUNALYZE_API_TOKEN is not configured');
+      expect(parsed.error).toBe('Authentication Required');
+      expect(parsed.message).toContain('No Runalyze API token provided');
       expect(parsed.instructions).toBeDefined();
     });
   });

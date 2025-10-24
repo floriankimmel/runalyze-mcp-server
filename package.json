@@ -6,8 +6,11 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "build:http": "tsc",
     "start": "node dist/main.js",
+    "start:http": "node dist/main-http.js",
     "start:dev": "nodemon --watch src --exec ts-node src/main.ts",
+    "start:http:dev": "nodemon --watch src --exec ts-node src/main-http.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

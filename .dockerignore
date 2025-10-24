@@ -1,0 +1,46 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Development files
+*.log
+*.md
+.git/
+.gitignore
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Environment files (secrets should be passed via Fly.io secrets)
+.env
+.env.*
+
+# CI/CD
+.github/
+
+# Documentation
+README.md
+docs/
+
+# Linting and formatting
+.eslintrc.js
+.prettierrc
+.editorconfig
+
+# Husky
+.husky/
+
+# Fly.io
+fly.toml

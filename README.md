@@ -14,6 +14,9 @@ A secure MCP server that lets you retrieve health data (HRV, Sleep, Resting Hear
   - [Installation](#-installation)
   - [Configuration](#-configuration)
   - [Usage](#-usage)
+- [Deployment](#-deployment)
+  - [Fly.io Deployment](#flyio-deployment)
+  - [Using the HTTP Server](#using-the-http-server)
 - [For Developers](#-for-developers)
   - [Development Setup](#development-setup)
   - [Project Structure](#project-structure)
@@ -312,6 +315,197 @@ Retrieves resting heart rate data from your Runalyze account.
 
 ---
 
+# 🚢 Deployment
+
+This MCP server supports two deployment modes:
+- **STDIO Mode** (local): Communicates via stdin/stdout for local AI assistants
+- **HTTP Mode** (hosted): Runs as an HTTP API that can be deployed to cloud platforms
+
+## Architecture Overview
+
+### STDIO Mode (Local)
+- Entry point: `src/main.ts`
+- Module: `src/app.module.ts`
+- Transport: STDIO (stdin/stdout)
+- Authentication: API token from environment variable (`RUNALYZE_API_TOKEN`)
+- Use case: Personal use with Claude Desktop, ChatGPT Desktop, VS Code extensions
+
+### HTTP Mode (Hosted)
+- Entry point: `src/main-http.ts`
+- Module: `src/app-http.module.ts`
+- Transport: HTTP (standard REST API)
+- Authentication: Bearer token in Authorization header (per-request)
+- Use case: Multi-user hosted service, API access, cloud deployment
+
+Both modes share the same tool implementations and business logic. The only difference is:
+1. **Authentication**: STDIO uses env var, HTTP uses Bearer token
+2. **Transport**: STDIO uses stdin/stdout, HTTP uses standard HTTP
+
+## Fly.io Deployment
+
+The server can be deployed to Fly.io for hosted access via HTTP transport.
+
+### Prerequisites
+
+- Fly.io account ([Sign up here](https://fly.io/))
+- Fly.io CLI installed (`brew install flyctl` on macOS)
+- Authenticated with Fly.io (`flyctl auth login`)
+
+### Authentication Model
+
+**Important:** The HTTP server uses Bearer token authentication. Each user must provide their own Runalyze API token when making requests:
+
+```
+Authorization: Bearer YOUR_RUNALYZE_TOKEN
+```
+
+This means:
+- The server itself does NOT store any API tokens
+- Each user authenticates with their own Runalyze credentials
+- Multiple users can use the same deployed server with their own tokens
+- No secrets need to be configured on Fly.io
+
+### Initial Setup
+
+The Fly.io app has been pre-configured as `runalyze-mcp-server`. To deploy:
+
+```bash
+# Ensure you're in the project directory
+cd runalyze-mcp-server
+
+# Deploy to Fly.io
+fly deploy
+```
+
+The deployment will:
+1. Build a Docker image with the HTTP server
+2. Deploy to Fly.io with auto-scaling enabled
+3. Configure health checks
+4. Enable Bearer token authentication
+
+### Configuration
+
+The `fly.toml` file contains all deployment configuration:
+- **Region**: Amsterdam (ams) - can be changed
+- **Resources**: 256MB RAM, 1 shared CPU
+- **Auto-scaling**: Scales to zero when idle, auto-starts on request
+- **Health checks**: HTTP GET on `/health` endpoint
+- **Authentication**: Bearer token required (no secrets stored)
+
+### Automated Deployment with GitHub Actions
+
+The repository includes a GitHub Actions workflow that automatically deploys to Fly.io on every push to the `main` branch.
+
+#### Setup GitHub Actions
+
+1. Get your Fly.io API token:
+   ```bash
+   fly auth token
+   ```
+
+2. Add the token as a GitHub secret:
+   - Go to your repository on GitHub
+   - Navigate to **Settings → Secrets and variables → Actions**
+   - Click **New repository secret**
+   - Name: `FLY_API_TOKEN`
+   - Value: Your Fly.io API token
+   - Click **Add secret**
+
+3. Push to main branch:
+   ```bash
+   git push origin main
+   ```
+
+The workflow will automatically:
+- Build the Docker image
+- Deploy to Fly.io
+- Run health checks
+- Report deployment status
+
+#### Manual Deployment Trigger
+
+You can also trigger deployment manually:
+- Go to **Actions** tab in GitHub
+- Select **Deploy to Fly.io** workflow
+- Click **Run workflow**
+
+### Monitoring
+
+```bash
+# View logs
+fly logs -a runalyze-mcp-server
+
+# Check app status
+fly status -a runalyze-mcp-server
+
+# Open app dashboard
+fly dashboard -a runalyze-mcp-server
+```
+
+### Scaling
+
+```bash
+# Scale to specific machine count
+fly scale count 1 -a runalyze-mcp-server
+
+# Update memory/CPU
+fly scale memory 512 -a runalyze-mcp-server
+```
+
+## Using the HTTP Server
+
+### Local Development
+
+Run the HTTP server locally:
+
+```bash
+# Development mode with hot-reload
+yarn start:http:dev
+
+# Production mode
+yarn build:http
+yarn start:http
+```
+
+The server will be available at `http://localhost:3000`.
+
+### HTTP Endpoints
+
+- **Health Check**: `GET /health` - Returns server status (no auth required)
+- **MCP HTTP Endpoint**: `/mcp` - HTTP endpoint for MCP communication (requires Bearer token)
+
+### Authentication
+
+All MCP endpoints require Bearer token authentication. Include your Runalyze API token in the Authorization header:
+
+```bash
+# Example: Get HRV data
+curl -X POST https://runalyze-mcp-server.fly.dev/mcp \
+  -H "Authorization: Bearer YOUR_RUNALYZE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"method":"tools/call","params":{"name":"get-runalyze-hrv-data","arguments":{"page":1}}}'
+```
+
+### Connecting AI Clients to HTTP Server
+
+To use the hosted HTTP version with MCP clients that support HTTP transport:
+
+1. **Endpoint URL**: `https://runalyze-mcp-server.fly.dev/mcp`
+2. **Authentication**: Include `Authorization: Bearer YOUR_RUNALYZE_TOKEN` header
+3. **Get Token**: Visit https://runalyze.com/settings/personal-api
+
+Note: Not all MCP clients support HTTP transport yet. Check your client's documentation.
+
+### Multi-User Support
+
+The HTTP deployment supports multiple users:
+- Each user provides their own Runalyze API token
+- No shared credentials or server-side token storage
+- Users only access their own Runalyze data
+- Stateless authentication for scalability
+
+---
+
 # 👨‍💻 For Developers
 
 ## Development Setup
@@ -362,10 +556,18 @@ runalyze-mcp-server/
 │   │   ├── runalyze-hrv.tool.ts                # HRV data retrieval tool
 │   │   ├── runalyze-sleep.tool.ts              # Sleep data retrieval tool
 │   │   └── runalyze-heart-rate-rest.tool.ts    # Resting heart rate tool
-│   ├── app.module.ts                           # Root module
-│   └── main.ts                                 # Application entry point (STDIO mode)
+│   ├── app.module.ts                           # Root module (STDIO mode)
+│   ├── app-http.module.ts                      # Root module (HTTP mode)
+│   ├── main.ts                                 # Application entry point (STDIO mode)
+│   └── main-http.ts                            # Application entry point (HTTP mode)
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                          # GitHub Actions deployment workflow
 ├── dist/                                       # Compiled output (generated)
 ├── coverage/                                   # Test coverage reports (generated)
+├── Dockerfile                                  # Docker configuration for HTTP deployment
+├── .dockerignore                               # Docker ignore file
+├── fly.toml                                    # Fly.io configuration
 ├── .eslintrc.js                                # ESLint configuration
 ├── .prettierrc                                 # Prettier configuration
 ├── jest.config.js                              # Jest configuration
@@ -570,9 +772,12 @@ The application will fail to start if required environment variables are missing
 
 | Command | Description |
 |---------|-------------|
-| `yarn build` | Compile TypeScript to JavaScript |
-| `yarn start` | Run the compiled application |
-| `yarn start:dev` | Run in development mode with hot-reload |
+| `yarn build` | Compile TypeScript to JavaScript (STDIO mode) |
+| `yarn build:http` | Compile TypeScript to JavaScript (HTTP mode) |
+| `yarn start` | Run the compiled application (STDIO mode) |
+| `yarn start:http` | Run the compiled application (HTTP mode) |
+| `yarn start:dev` | Run in development mode with hot-reload (STDIO) |
+| `yarn start:http:dev` | Run in development mode with hot-reload (HTTP) |
 | `yarn test` | Run all tests |
 | `yarn test:watch` | Run tests in watch mode |
 | `yarn test:cov` | Generate test coverage report |

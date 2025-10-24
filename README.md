@@ -398,47 +398,57 @@ The repository includes a GitHub Actions workflow that automatically deploys to 
 
 #### Setup GitHub Actions
 
-1. Get your Fly.io API token:
+**⚠️ Required: Add Fly.io API Token to GitHub Secrets**
+
+The GitHub Actions workflow requires a `FLY_API_TOKEN` secret to deploy. Follow these steps:
+
+1. **Get your Fly.io API token:**
    ```bash
    fly auth token
    ```
 
-2. Add the token as a GitHub secret:
-   - Go to your repository on GitHub
+   This will output a token starting with `FlyV1_` - copy the entire token.
+
+2. **Add the token as a GitHub secret:**
+   - Go to your repository on GitHub: https://github.com/YOUR_USERNAME/runalyze-mcp-server
    - Navigate to **Settings → Secrets and variables → Actions**
    - Click **New repository secret**
    - Name: `FLY_API_TOKEN`
-   - Value: Your Fly.io API token
+   - Value: Paste your Fly.io API token (starts with `FlyV1_`)
    - Click **Add secret**
 
-3. Push to main branch:
+3. **Trigger deployment:**
+
+   Option A - Automatic: Push to main branch:
    ```bash
    git push origin main
    ```
 
-The workflow will automatically:
-- Build the Docker image
-- Deploy to Fly.io
-- Run health checks
-- Report deployment status
+   Option B - Manual: Go to **Actions** tab → **Deploy to Fly.io** → **Run workflow**
 
-#### Manual Deployment Trigger
+**What the workflow does:**
+- ✅ Builds the Docker image using Fly.io's remote builder
+- ✅ Deploys to Fly.io (https://runalyze-mcp-server.fly.dev)
+- ✅ Runs health checks to verify deployment
+- ✅ Reports deployment status in GitHub Actions
 
-You can also trigger deployment manually:
-- Go to **Actions** tab in GitHub
-- Select **Deploy to Fly.io** workflow
-- Click **Run workflow**
+#### Monitoring Deployments
 
-### Monitoring
+**GitHub Actions:**
+- **View workflow runs:** Go to **Actions** tab in your GitHub repository
+- **Check deployment logs:** Click on any workflow run to see detailed logs
+- **Deployment URL:** https://runalyze-mcp-server.fly.dev
+
+**Fly.io CLI:**
 
 ```bash
-# View logs
+# View real-time logs
 fly logs -a runalyze-mcp-server
 
 # Check app status
 fly status -a runalyze-mcp-server
 
-# Open app dashboard
+# Open Fly.io dashboard
 fly dashboard -a runalyze-mcp-server
 ```
 

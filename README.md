@@ -2,53 +2,95 @@
 
 > Access your Runalyze health metrics through AI assistants using the Model Context Protocol (MCP)
 
-A secure MCP server that lets you retrieve health data (HRV, Sleep, Resting Heart Rate) from your Runalyze account directly within AI chat applications like Claude Desktop and ChatGPT Desktop.
+A secure MCP server that lets you retrieve health data (HRV, Sleep, Resting Heart Rate, Activities) from your Runalyze account directly within AI chat applications like Claude Desktop and ChatGPT Desktop.
+
+---
+
+## 🎯 Choose Your Setup
+
+This server can be used in **two ways**. Choose the option that works best for you:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🖥️ **Local Setup**
+**Run on your own computer**
+
+**Pros:**
+- ✅ Complete privacy - data stays on your machine
+- ✅ No internet required after setup
+- ✅ Free to use
+- ✅ Full control
+
+**Cons:**
+- ⚠️ Requires Node.js installation
+- ⚠️ Need to build from source
+- ⚠️ Only works on the computer where it's installed
+
+**Setup time:** ~5 minutes
+
+👉 [**Setup Locally**](#-option-1-local-setup)
+
+</td>
+<td width="50%" valign="top">
+
+### ☁️ **Hosted Setup**
+**Use our hosted server**
+
+**Pros:**
+- ✅ No installation required
+- ✅ Works from any device
+- ✅ Always up-to-date
+- ✅ Quick 2-minute setup
+
+**Cons:**
+- ⚠️ Requires internet connection
+- ⚠️ Depends on hosted service availability
+
+**Setup time:** ~2 minutes
+
+**Server URL:** `https://runalyze-mcp-server.fly.dev`
+
+👉 [**Use Hosted Version**](#%EF%B8%8F-option-2-hosted-setup)
+
+</td>
+</tr>
+</table>
+
+**Security Note:** Both options are secure. The hosted version does NOT store your API token - you provide it with each request, just like the local version stores it in your config file.
 
 ---
 
 ## 📖 Table of Contents
 
-- [For Users](#-for-users)
-  - [What is this?](#-what-is-this)
-  - [Prerequisites](#-prerequisites)
-  - [Installation](#-installation)
-  - [Configuration](#-configuration)
-  - [Usage](#-usage)
-- [Deployment](#-deployment)
-  - [Fly.io Deployment](#flyio-deployment)
-  - [Using the HTTP Server](#using-the-http-server)
-- [For Developers](#-for-developers)
-  - [Development Setup](#development-setup)
-  - [Project Structure](#project-structure)
-  - [Testing](#testing)
-  - [Code Quality](#code-quality)
-  - [Creating New Tools](#creating-new-tools)
+- [Option 1: Local Setup](#-option-1-local-setup)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configure Your AI Tool](#configure-your-ai-tool-local)
+- [Option 2: Hosted Setup](#%EF%B8%8F-option-2-hosted-setup)
+  - [Configure Your AI Tool](#configure-your-ai-tool-hosted)
+- [What You Can Do](#-what-you-can-do)
+- [Troubleshooting](#-troubleshooting)
 
 ---
 
-# 👤 For Users
+# 🖥️ Option 1: Local Setup
 
-## 🤔 What is this?
+Run the MCP server on your own computer.
 
-This MCP server allows AI assistants to retrieve health metrics from Runalyze. Once configured, you can ask questions like:
+## Prerequisites
 
-- "What's my latest HRV data?"
-- "Show me my sleep data from last week"
-- "What was my resting heart rate this morning?"
-- "Analyze my HRV trends over the past month"
-
-The AI will automatically fetch your data and provide insights!
-
-## ✅ Prerequisites
+Before you start, make sure you have:
 
 - **Node.js** v18 or higher ([Download here](https://nodejs.org/))
 - **Yarn** package manager ([Installation guide](https://yarnpkg.com/getting-started/install))
-- A **Runalyze account** with premium access (for API access)
-- An **AI assistant** that supports MCP (Claude Desktop, ChatGPT Desktop, etc.)
+- A **Runalyze account** with premium access ([Get premium](https://runalyze.com/premium))
+- An **AI assistant** that supports MCP (Claude Desktop, ChatGPT Desktop, VS Code extensions, etc.)
 
-## 📥 Installation
+## Installation
 
-### Step 1: Download the Server
+### Step 1: Download and Build
 
 ```bash
 # Clone the repository
@@ -62,23 +104,27 @@ yarn install
 yarn build
 ```
 
+The compiled server will be in the `dist/` directory.
+
 ### Step 2: Get Your Runalyze API Token
 
 1. Log in to your Runalyze account
-2. Navigate to **Settings → Personal API**: https://runalyze.com/settings/personal-api
-3. Generate a new API token
+2. Go to **Settings → Personal API**: https://runalyze.com/settings/personal-api
+3. Click **Generate new token**
 4. Copy the token (you'll need it in the next step)
 
-## ⚙️ Configuration
+## Configure Your AI Tool (Local)
+
+Choose your AI assistant and follow the configuration steps:
 
 ### For Claude Desktop 🟣
 
-1. Open your Claude Desktop configuration file:
+1. **Locate your configuration file:**
    - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
    - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
    - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-2. Add the Runalyze MCP server configuration:
+2. **Add the server configuration:**
 
 ```json
 {
@@ -96,9 +142,11 @@ yarn build
 }
 ```
 
-3. Replace `/absolute/path/to/runalyze-mcp-server` with the actual path where you installed the server
-4. Replace `your-api-token-here` with your Runalyze API token
-5. Restart Claude Desktop
+3. **Replace the values:**
+   - Change `/absolute/path/to/runalyze-mcp-server` to where you installed the server
+   - Replace `your-api-token-here` with your Runalyze API token
+
+4. **Restart Claude Desktop**
 
 ### For ChatGPT Desktop 🟢
 
@@ -109,15 +157,15 @@ yarn build
    - **Command**: `node`
    - **Arguments**: `/absolute/path/to/runalyze-mcp-server/dist/main.js`
    - **Environment Variables**:
-     - `RUNALYZE_API_TOKEN`: `your-api-token-here`
+     - Key: `RUNALYZE_API_TOKEN`
+     - Value: `your-api-token-here`
 
-4. Replace the path and token with your actual values
-5. Save and restart ChatGPT Desktop
+4. Save and restart ChatGPT Desktop
 
 ### For Cline (VS Code Extension) 💙
 
 1. Open VS Code settings (JSON)
-2. Add the MCP server configuration:
+2. Add this configuration:
 
 ```json
 {
@@ -135,7 +183,7 @@ yarn build
 }
 ```
 
-3. Replace the path and token with your actual values
+3. Replace the path and token with your values
 4. Reload VS Code
 
 ### For Continue (VS Code Extension) 🔵
@@ -160,13 +208,13 @@ yarn build
 }
 ```
 
-3. Replace the path and token with your actual values
+3. Replace the path and token with your values
 4. Restart Continue
 
 ### For Zed Editor 🌟
 
 1. Open Zed settings (`~/.config/zed/settings.json`)
-2. Add the MCP server configuration:
+2. Add this configuration:
 
 ```json
 {
@@ -186,647 +234,257 @@ yarn build
 }
 ```
 
-3. Replace the path and token with your actual values
+3. Replace the path and token with your values
 4. Restart Zed
 
-## 🚀 Usage
-
-Once configured, you can use the following tools in your AI assistant:
-
-### `get-runalyze-activities`
-
-Retrieves a list of activities from your Runalyze account.
-
-**Parameters:**
-- `page` (optional): Page number for pagination (default: 1)
-
-**Example prompts:**
-- "Get my activities from Runalyze"
-- "Show me my recent workouts"
-- "What activities did I log this week?"
-
-**Response includes:**
-- Activity ID and title
-- Sport type and activity type
-- Date, time, and timezone information
-- Distance, duration, and elapsed time
-- Elevation data (up, down, climb score)
-- Heart rate metrics (avg, max, recovery)
-- VO2max estimates and training metrics
-- Power data (for cycling)
-- Running dynamics (cadence, vertical oscillation, ground contact time, etc.)
-- Cycling metrics (balance, torque effectiveness, pedal smoothness, etc.)
-- Weather conditions (temperature, wind, humidity, etc.)
-- Race results (if applicable)
-- Equipment and tags
-- Climb information
-
-### `get-runalyze-activity-detail`
-
-Retrieves detailed information for a specific activity by ID from your Runalyze account.
-
-**Parameters:**
-- `id` (required): The activity ID to retrieve
-
-**Example prompts:**
-- "Get details for activity 12345"
-- "Show me the full details of my run with ID 12345"
-- "What are the metrics for activity 12345?"
-
-**Response includes:**
-All the same detailed information as `get-runalyze-activities`, but for a single specific activity. This is useful when you know the activity ID and want complete details about that particular workout.
-
-### `get-runalyze-hrv-data`
-
-Retrieves Heart Rate Variability (HRV) data from your Runalyze account.
-
-**Parameters:**
-- `page` (optional): Page number for pagination (default: 1)
-
-**Example prompts:**
-- "Get my HRV data from Runalyze"
-- "Show me page 2 of my HRV measurements"
-- "What does my recent HRV data look like?"
-
-**Response includes:**
-- HRV measurement ID
-- Date and time of measurement
-- Metric value (e.g., RMSSD)
-- Measurement type
-
-### `get-runalyze-sleep-data`
-
-Retrieves sleep data from your Runalyze account.
-
-**Parameters:**
-- `page` (optional): Page number for pagination (default: 1)
-
-**Example prompts:**
-- "Get my sleep data from Runalyze"
-- "Show me my sleep patterns for the last month"
-- "How many hours did I sleep last week?"
-
-**Response includes:**
-- Sleep measurement ID
-- Date and time
-- Metric value (e.g., hours slept)
-- Measurement type
-
-### `get-runalyze-heart-rate-rest-data`
-
-Retrieves resting heart rate data from your Runalyze account.
-
-**Parameters:**
-- `page` (optional): Page number for pagination (default: 1)
-
-**Example prompts:**
-- "Get my resting heart rate data"
-- "What was my resting heart rate this morning?"
-- "Show me my resting heart rate trend over the past week"
-
-**Response includes:**
-- Resting heart rate measurement ID
-- Date and time
-- Metric value (beats per minute)
-- Measurement type
-
-## 🔒 Security Notes
-
-- Your API token is stored securely in your MCP client's configuration
-- The server validates the token at startup - it won't run without a valid token
-- All communication happens locally on your machine
-- No data is sent to third parties
-
-## 🐛 Troubleshooting
-
-### Server won't start
-- **Check your API token**: Make sure it's valid and has the correct permissions
-- **Verify the path**: Ensure the path to `dist/main.js` is absolute and correct
-- **Check Node.js version**: Must be v18 or higher (`node --version`)
-
-### "Configuration validation failed"
-- This means the `RUNALYZE_API_TOKEN` environment variable is missing or empty
-- Double-check your MCP client configuration
-
-### No data returned
-- Ensure you have the relevant health data in your Runalyze account
-- Check that your account has premium/supporter access (required for API access)
-- Verify your API token has the necessary permissions
-
 ---
 
-# 🚢 Deployment
+# ☁️ Option 2: Hosted Setup
 
-This MCP server supports two deployment modes:
-- **STDIO Mode** (local): Communicates via stdin/stdout for local AI assistants
-- **HTTP Mode** (hosted): Runs as an HTTP API that can be deployed to cloud platforms
+Use our hosted MCP server - no installation required!
 
-## Architecture Overview
+**Server URL:** `https://runalyze-mcp-server.fly.dev`
 
-### STDIO Mode (Local)
-- Entry point: `src/main.ts`
-- Module: `src/app.module.ts`
-- Transport: STDIO (stdin/stdout)
-- Authentication: API token from environment variable (`RUNALYZE_API_TOKEN`)
-- Use case: Personal use with Claude Desktop, ChatGPT Desktop, VS Code extensions
+## Get Your Runalyze API Token
 
-### HTTP Mode (Hosted)
-- Entry point: `src/main-http.ts`
-- Module: `src/app-http.module.ts`
-- Transport: HTTP (standard REST API)
-- Authentication: Bearer token in Authorization header (per-request)
-- Use case: Multi-user hosted service, API access, cloud deployment
+1. Log in to your Runalyze account
+2. Go to **Settings → Personal API**: https://runalyze.com/settings/personal-api
+3. Click **Generate new token**
+4. Copy the token (you'll need it in the next step)
 
-Both modes share the same tool implementations and business logic. The only difference is:
-1. **Authentication**: STDIO uses env var, HTTP uses Bearer token
-2. **Transport**: STDIO uses stdin/stdout, HTTP uses standard HTTP
+## Configure Your AI Tool (Hosted)
 
-## Fly.io Deployment
+Choose your AI assistant and follow the configuration steps:
 
-The server can be deployed to Fly.io for hosted access via HTTP transport.
+### For Claude Desktop 🟣
 
-### Prerequisites
+**Note:** Claude Desktop currently only supports STDIO transport. To use the hosted version, you would need an HTTP-to-STDIO bridge. For now, we recommend using the [Local Setup](#-option-1-local-setup) with Claude Desktop.
 
-- Fly.io account ([Sign up here](https://fly.io/))
-- Fly.io CLI installed (`brew install flyctl` on macOS)
-- Authenticated with Fly.io (`flyctl auth login`)
+### For ChatGPT Desktop 🟢
 
-### Authentication Model
+**Note:** Check if ChatGPT Desktop supports HTTP transport for MCP servers. If not, use the [Local Setup](#-option-1-local-setup) instead.
 
-**Important:** The HTTP server uses Bearer token authentication. Each user must provide their own Runalyze API token when making requests:
+### For MCP Clients with HTTP Support
 
-```
-Authorization: Bearer YOUR_RUNALYZE_TOKEN
-```
+If your AI tool supports MCP over HTTP, configure it with:
 
-This means:
-- The server itself does NOT store any API tokens
-- Each user authenticates with their own Runalyze credentials
-- Multiple users can use the same deployed server with their own tokens
-- No secrets need to be configured on Fly.io
+- **Endpoint URL**: `https://runalyze-mcp-server.fly.dev/mcp`
+- **Authentication**: Bearer token
+- **Token**: Your Runalyze API token
 
-### Initial Setup
+**Example configuration format:**
 
-The Fly.io app has been pre-configured as `runalyze-mcp-server`. To deploy:
-
-```bash
-# Ensure you're in the project directory
-cd runalyze-mcp-server
-
-# Deploy to Fly.io
-fly deploy
-```
-
-The deployment will:
-1. Build a Docker image with the HTTP server
-2. Deploy to Fly.io with auto-scaling enabled
-3. Configure health checks
-4. Enable Bearer token authentication
-
-### Configuration
-
-The `fly.toml` file contains all deployment configuration:
-- **Region**: Amsterdam (ams) - can be changed
-- **Resources**: 256MB RAM, 1 shared CPU
-- **Auto-scaling**: Scales to zero when idle, auto-starts on request
-- **Health checks**: HTTP GET on `/health` endpoint
-- **Authentication**: Bearer token required (no secrets stored)
-
-### Automated Deployment with GitHub Actions
-
-The repository includes a GitHub Actions workflow that automatically deploys to Fly.io on every push to the `main` branch.
-
-#### Setup GitHub Actions
-
-**⚠️ Required: Add Fly.io API Token to GitHub Secrets**
-
-The GitHub Actions workflow requires a `FLY_API_TOKEN` secret to deploy. Follow these steps:
-
-1. **Get your Fly.io API token:**
-   ```bash
-   fly auth token
-   ```
-
-   This will output a token starting with `FlyV1_` - copy the entire token.
-
-2. **Add the token as a GitHub secret:**
-   - Go to your repository on GitHub: https://github.com/YOUR_USERNAME/runalyze-mcp-server
-   - Navigate to **Settings → Secrets and variables → Actions**
-   - Click **New repository secret**
-   - Name: `FLY_API_TOKEN`
-   - Value: Paste your Fly.io API token (starts with `FlyV1_`)
-   - Click **Add secret**
-
-3. **Trigger deployment:**
-
-   Option A - Automatic: Push to main branch:
-   ```bash
-   git push origin main
-   ```
-
-   Option B - Manual: Go to **Actions** tab → **Deploy to Fly.io** → **Run workflow**
-
-**What the workflow does:**
-- ✅ Builds the Docker image using Fly.io's remote builder
-- ✅ Deploys to Fly.io (https://runalyze-mcp-server.fly.dev)
-- ✅ Runs health checks to verify deployment
-- ✅ Reports deployment status in GitHub Actions
-
-#### Monitoring Deployments
-
-**GitHub Actions:**
-- **View workflow runs:** Go to **Actions** tab in your GitHub repository
-- **Check deployment logs:** Click on any workflow run to see detailed logs
-- **Deployment URL:** https://runalyze-mcp-server.fly.dev
-
-**Fly.io CLI:**
-
-```bash
-# View real-time logs
-fly logs -a runalyze-mcp-server
-
-# Check app status
-fly status -a runalyze-mcp-server
-
-# Open Fly.io dashboard
-fly dashboard -a runalyze-mcp-server
-```
-
-### Scaling
-
-```bash
-# Scale to specific machine count
-fly scale count 1 -a runalyze-mcp-server
-
-# Update memory/CPU
-fly scale memory 512 -a runalyze-mcp-server
-```
-
-## Using the HTTP Server
-
-### Local Development
-
-Run the HTTP server locally:
-
-```bash
-# Development mode with hot-reload
-yarn start:http:dev
-
-# Production mode
-yarn build:http
-yarn start:http
-```
-
-The server will be available at `http://localhost:3000`.
-
-### HTTP Endpoints
-
-- **Health Check**: `GET /health` - Returns server status (no auth required)
-- **MCP HTTP Endpoint**: `/mcp` - HTTP endpoint for MCP communication (requires Bearer token)
-
-### Authentication
-
-All MCP endpoints require Bearer token authentication. Include your Runalyze API token in the Authorization header:
-
-```bash
-# Example: Get HRV data
-curl -X POST https://runalyze-mcp-server.fly.dev/mcp \
-  -H "Authorization: Bearer YOUR_RUNALYZE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"method":"tools/call","params":{"name":"get-runalyze-hrv-data","arguments":{"page":1}}}'
-```
-
-### Connecting AI Clients to HTTP Server
-
-To use the hosted HTTP version with MCP clients that support HTTP transport:
-
-1. **Endpoint URL**: `https://runalyze-mcp-server.fly.dev/mcp`
-2. **Authentication**: Include `Authorization: Bearer YOUR_RUNALYZE_TOKEN` header
-3. **Get Token**: Visit https://runalyze.com/settings/personal-api
-
-Note: Not all MCP clients support HTTP transport yet. Check your client's documentation.
-
-### Multi-User Support
-
-The HTTP deployment supports multiple users:
-- Each user provides their own Runalyze API token
-- No shared credentials or server-side token storage
-- Users only access their own Runalyze data
-- Stateless authentication for scalability
-
----
-
-# 👨‍💻 For Developers
-
-## Development Setup
-
-### Prerequisites
-- Node.js v18 or higher
-- Yarn package manager
-- Basic knowledge of TypeScript and NestJS
-
-### Getting Started
-
-```bash
-# Clone the repository
-git clone https://github.com/floriankimmel/runalyze-mcp-server.git
-cd runalyze-mcp-server
-
-# Install dependencies (this also sets up the pre-commit hook)
-yarn install
-
-# Start development server with hot-reload
-yarn start:dev
-```
-
-**Note**: The `yarn install` command automatically sets up a pre-commit hook using Husky. This hook runs ESLint and Prettier on staged files before each commit to ensure code quality.
-
-### Build
-
-Compile TypeScript to JavaScript:
-
-```bash
-yarn build
-```
-
-Output will be in the `dist/` directory.
-
-## Project Structure
-
-```
-runalyze-mcp-server/
-├── src/
-│   ├── config/
-│   │   └── configuration.ts                    # Configuration with Zod validation
-│   ├── tools/
-│   │   ├── __tests__/                          # Co-located tests
-│   │   │   ├── runalyze-hrv.tool.integration.ts
-│   │   │   ├── runalyze-sleep.tool.integration.ts
-│   │   │   └── runalyze-heart-rate-rest.tool.integration.ts
-│   │   ├── runalyze-hrv.tool.ts                # HRV data retrieval tool
-│   │   ├── runalyze-sleep.tool.ts              # Sleep data retrieval tool
-│   │   └── runalyze-heart-rate-rest.tool.ts    # Resting heart rate tool
-│   ├── app.module.ts                           # Root module (STDIO mode)
-│   ├── app-http.module.ts                      # Root module (HTTP mode)
-│   ├── main.ts                                 # Application entry point (STDIO mode)
-│   └── main-http.ts                            # Application entry point (HTTP mode)
-├── .github/
-│   └── workflows/
-│       └── deploy.yml                          # GitHub Actions deployment workflow
-├── dist/                                       # Compiled output (generated)
-├── coverage/                                   # Test coverage reports (generated)
-├── Dockerfile                                  # Docker configuration for HTTP deployment
-├── .dockerignore                               # Docker ignore file
-├── fly.toml                                    # Fly.io configuration
-├── .eslintrc.js                                # ESLint configuration
-├── .prettierrc                                 # Prettier configuration
-├── jest.config.js                              # Jest configuration
-├── tsconfig.json                               # TypeScript configuration
-└── package.json                                # Dependencies and scripts
-```
-
-## Testing
-
-### Run Tests
-
-```bash
-# Run all tests
-yarn test
-
-# Run tests in watch mode
-yarn test:watch
-
-# Generate coverage report
-yarn test:cov
-```
-
-### Writing Tests
-
-Tests are co-located with the source files in `__tests__/` directories:
-
-```
-src/tools/
-├── __tests__/
-│   └── my-tool.integration.ts
-└── my-tool.tool.ts
-```
-
-Example test structure:
-
-```typescript
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { MyTool } from '../my-tool.tool';
-
-describe('MyTool', () => {
-  let tool: MyTool;
-
-  beforeEach(async () => {
-    const mockConfigService = {
-      get: jest.fn((key: string) => {
-        const config: Record<string, string> = {
-          'runalyze.apiToken': 'test-token',
-          'runalyze.baseUrl': 'https://runalyze.com',
-        };
-        return config[key];
-      }),
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        MyTool,
-        {
-          provide: ConfigService,
-          useValue: mockConfigService,
-        },
-      ],
-    }).compile();
-
-    tool = module.get<MyTool>(MyTool);
-  });
-
-  it('should be defined', () => {
-    expect(tool).toBeDefined();
-  });
-});
-```
-
-## Code Quality
-
-### Linting
-
-```bash
-# Check for linting issues
-yarn lint
-
-# Auto-fix linting issues
-yarn lint:fix
-```
-
-### Formatting
-
-```bash
-# Format code with Prettier
-yarn format
-```
-
-### Pre-commit Hook
-
-The project uses Husky and lint-staged to enforce code quality. Before each commit:
-
-1. ESLint runs on staged TypeScript files and attempts to auto-fix issues
-2. Prettier formats the code
-3. If any errors remain, the commit is blocked
-
-This ensures only properly linted code is committed to the repository.
-
-## Creating New Tools
-
-### Step 1: Create the Tool File
-
-Create a new file in `src/tools/`, e.g., `my-tool.tool.ts`:
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Tool, Context } from '@rekog/mcp-nest';
-import { z } from 'zod';
-import type { AppConfig } from '../config/configuration';
-
-// Define parameter schema with Zod
-const myToolSchema = z.object({
-  param1: z.string().describe('Description of param1'),
-  param2: z.number().optional().describe('Optional number parameter'),
-});
-
-@Injectable()
-export class MyTool {
-  constructor(private readonly configService: ConfigService<AppConfig>) {
-    // Access configuration if needed
-  }
-
-  @Tool({
-    name: 'my-tool-name',
-    description: 'What your tool does',
-    parameters: myToolSchema,
-  })
-  async execute(
-    params: z.infer<typeof myToolSchema>,
-    context: Context,
-  ): Promise<string> {
-    // Report progress
-    await context.reportProgress({ progress: 0, total: 100 });
-
-    // Your tool logic here
-    const result = {
-      message: 'Success',
-      data: params,
-    };
-
-    await context.reportProgress({ progress: 100, total: 100 });
-
-    return JSON.stringify(result, null, 2);
+```json
+{
+  "mcpServers": {
+    "runalyze": {
+      "url": "https://runalyze-mcp-server.fly.dev/mcp",
+      "transport": "http",
+      "headers": {
+        "Authorization": "Bearer YOUR_RUNALYZE_TOKEN"
+      }
+    }
   }
 }
 ```
 
-### Step 2: Register the Tool
+### Direct HTTP API Usage
 
-Add your tool to `src/app.module.ts`:
+You can also use the hosted server directly via HTTP:
 
-```typescript
-import { MyTool } from './tools/my-tool.tool';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({ ... }),
-    McpModule.forRoot({ ... }),
-  ],
-  providers: [
-    RunalyzeHrvTool,
-    RunalyzeSleepTool,
-    RunalyzeHeartRateRestTool,
-    MyTool, // Add your new tool here
-  ],
-})
-export class AppModule {}
-```
-
-### Step 3: Write Tests
-
-Create `src/tools/__tests__/my-tool.integration.ts` and write comprehensive tests.
-
-### Step 4: Build and Test
-
+**Health Check** (no authentication required):
 ```bash
-yarn build
-yarn test
+curl https://runalyze-mcp-server.fly.dev/health
 ```
 
-## Environment Configuration
-
-Configuration is managed through `src/config/configuration.ts` using Zod for validation:
-
-```typescript
-const configSchema = z.object({
-  runalyze: z.object({
-    apiToken: z.string().min(1, 'RUNALYZE_API_TOKEN is required'),
-    baseUrl: z.string().url().default('https://runalyze.com'),
-  }),
-});
+**Get HRV Data:**
+```bash
+curl -X POST https://runalyze-mcp-server.fly.dev/mcp \
+  -H "Authorization: Bearer YOUR_RUNALYZE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "tools/call",
+    "params": {
+      "name": "get-runalyze-hrv-data",
+      "arguments": {"page": 1}
+    }
+  }'
 ```
 
-The application will fail to start if required environment variables are missing.
+**Get Activities:**
+```bash
+curl -X POST https://runalyze-mcp-server.fly.dev/mcp \
+  -H "Authorization: Bearer YOUR_RUNALYZE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "tools/call",
+    "params": {
+      "name": "get-runalyze-activities",
+      "arguments": {"page": 1}
+    }
+  }'
+```
 
-## Available Scripts
+**Get Activity Details:**
+```bash
+curl -X POST https://runalyze-mcp-server.fly.dev/mcp \
+  -H "Authorization: Bearer YOUR_RUNALYZE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "tools/call",
+    "params": {
+      "name": "get-runalyze-activity-detail",
+      "arguments": {"id": 12345}
+    }
+  }'
+```
 
-| Command | Description |
-|---------|-------------|
-| `yarn build` | Compile TypeScript to JavaScript (STDIO mode) |
-| `yarn build:http` | Compile TypeScript to JavaScript (HTTP mode) |
-| `yarn start` | Run the compiled application (STDIO mode) |
-| `yarn start:http` | Run the compiled application (HTTP mode) |
-| `yarn start:dev` | Run in development mode with hot-reload (STDIO) |
-| `yarn start:http:dev` | Run in development mode with hot-reload (HTTP) |
-| `yarn test` | Run all tests |
-| `yarn test:watch` | Run tests in watch mode |
-| `yarn test:cov` | Generate test coverage report |
-| `yarn lint` | Check for linting issues |
-| `yarn lint:fix` | Auto-fix linting issues |
-| `yarn format` | Format code with Prettier |
+---
 
-## Technology Stack
+## 🎯 What You Can Do
 
-- **[NestJS](https://nestjs.com/)** - Progressive Node.js framework
-- **[@rekog/mcp-nest](https://github.com/rekog-labs/MCP-Nest)** - NestJS MCP integration
-- **[Zod](https://zod.dev/)** - TypeScript-first schema validation
-- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
-- **[Jest](https://jestjs.io/)** - Testing framework
-- **[ESLint](https://eslint.org/)** - Code linting
-- **[Prettier](https://prettier.io/)** - Code formatting
+Once configured, you can ask your AI assistant questions like:
 
-## Learn More
+### Activities
+- "Show me my recent activities from Runalyze"
+- "What workouts did I log this week?"
+- "Get details for activity 12345"
+- "Analyze my running data from last month"
 
-- 📚 [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
-- 🏃 [Runalyze API Documentation](https://runalyze.com/doc/api)
-- 🎯 [MCP-Nest GitHub](https://github.com/rekog-labs/MCP-Nest)
-- 📖 [NestJS Documentation](https://docs.nestjs.com/)
-- ✅ [Zod Documentation](https://zod.dev/)
+### Heart Rate Variability (HRV)
+- "What's my latest HRV data?"
+- "Show me my HRV trends over the past month"
+- "How is my recovery looking based on HRV?"
 
-## Contributing
+### Sleep Data
+- "Show me my sleep data from last week"
+- "How many hours did I sleep last night?"
+- "What's my sleep pattern this month?"
 
-Contributions are welcome! Please:
+### Resting Heart Rate
+- "What was my resting heart rate this morning?"
+- "Show me my resting heart rate trend"
+- "Is my resting heart rate improving?"
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Write tests for your changes
-4. Ensure all tests pass (`yarn test`)
-5. Ensure code quality checks pass (`yarn lint && yarn format`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
+The AI will automatically fetch your data and provide insights!
 
-## License
+### Available Tools
+
+The server provides these tools to your AI assistant:
+
+1. **`get-runalyze-activities`** - Get your activity list (runs, rides, workouts)
+2. **`get-runalyze-activity-detail`** - Get detailed info for a specific activity
+3. **`get-runalyze-hrv-data`** - Retrieve Heart Rate Variability measurements
+4. **`get-runalyze-sleep-data`** - Get sleep tracking data
+5. **`get-runalyze-heart-rate-rest-data`** - Get resting heart rate measurements
+
+All tools support pagination for browsing through historical data.
+
+---
+
+## 🔒 Security Notes
+
+### Local Setup
+- Your API token is stored in your MCP client's configuration file on your computer
+- All communication happens locally on your machine
+- No data is sent to third parties
+- Token is validated at startup
+
+### Hosted Setup
+- **No tokens are stored on the server**
+- Each request requires your Runalyze API token in the Authorization header
+- You only access your own data
+- All communication is over HTTPS
+- The server is stateless - it doesn't remember anything between requests
+
+**Both options are secure.** Choose based on your preference:
+- **Local** = Maximum privacy, everything on your machine
+- **Hosted** = Convenience, no installation needed
+
+---
+
+## 🐛 Troubleshooting
+
+### Local Setup Issues
+
+**Server won't start**
+- ✅ Check your API token is valid: https://runalyze.com/settings/personal-api
+- ✅ Verify the path to `dist/main.js` is absolute and correct
+- ✅ Ensure Node.js v18+ is installed: `node --version`
+- ✅ Check you ran `yarn build` successfully
+- ✅ Try running `node /absolute/path/to/dist/main.js` manually to see error messages
+
+**"Configuration validation failed"**
+- ✅ The `RUNALYZE_API_TOKEN` environment variable is missing in your config
+- ✅ Double-check your MCP client configuration syntax (valid JSON)
+- ✅ Ensure the token has no extra spaces or quotes
+
+**No data returned**
+- ✅ Verify you have data in your Runalyze account
+- ✅ Check your account has premium/supporter access (required for API)
+- ✅ Ensure your API token has the necessary permissions
+- ✅ Try accessing https://runalyze.com/api/v1/metrics/hrv directly in your browser while logged in
+
+**AI assistant doesn't see the tools**
+- ✅ Restart your AI assistant after configuration changes
+- ✅ Check the MCP server appears in the AI assistant's MCP server list
+- ✅ Look for error messages in the AI assistant's logs/developer console
+- ✅ Verify the JSON configuration is valid (use a JSON validator)
+
+### Hosted Setup Issues
+
+**Connection fails**
+- ✅ Check the server is running: `curl https://runalyze-mcp-server.fly.dev/health`
+- ✅ Verify you have internet connectivity
+- ✅ Ensure the URL is correct: `https://runalyze-mcp-server.fly.dev/mcp`
+
+**Authentication errors (401 Unauthorized)**
+- ✅ Ensure you're including the `Authorization: Bearer YOUR_TOKEN` header
+- ✅ Verify your Runalyze API token is valid and not expired
+- ✅ Check there are no extra spaces in the token
+- ✅ Make sure you copied the complete token from Runalyze
+
+**404 or other errors**
+- ✅ Verify the endpoint path is `/mcp` not just `/`
+- ✅ Check you're using POST method, not GET
+- ✅ Ensure Content-Type header is `application/json`
+
+**AI tool doesn't support HTTP transport**
+- ✅ Many MCP clients currently only support STDIO transport
+- ✅ Use the [Local Setup](#-option-1-local-setup) instead
+- ✅ Or use the HTTP API directly with curl/scripts
+
+### General Issues
+
+**Still having problems?**
+
+1. Check your Runalyze API token at https://runalyze.com/settings/personal-api
+2. Verify you have premium access: https://runalyze.com/premium
+3. Review [Runalyze API Documentation](https://runalyze.com/doc/api)
+4. Check [MCP Documentation](https://modelcontextprotocol.io/)
+5. Open an issue on [GitHub](https://github.com/floriankimmel/runalyze-mcp-server/issues)
+
+---
+
+## 📚 Learn More
+
+- 🏃 [Runalyze](https://runalyze.com/) - Training analysis platform
+- 📖 [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
+- 🤖 [Claude Desktop](https://claude.ai/) - AI assistant
+- 💬 [ChatGPT](https://chatgpt.com/) - AI assistant
+
+---
+
+## 🚀 For Developers
+
+Want to contribute or deploy your own instance? Check out:
+- [GitHub Repository](https://github.com/floriankimmel/runalyze-mcp-server)
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development setup and guidelines
+- [Fly.io Deployment Guide](https://fly.io/docs/) - Host your own instance
+
+---
+
+## 📝 License
 
 MIT
 

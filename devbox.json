@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": ["nodejs@24", "git", "gh"],
+  "shell": {
+    "init_hook": ["[ -f .env ] && export $(grep -v '^#' .env | xargs) || true"],
+    "scripts": {
+      "dev": ["yarn start:dev"],
+      "dev:http": ["yarn start:http:dev"],
+      "build": ["yarn build"],
+      "test": ["yarn test"],
+      "lint": ["yarn lint"],
+      "install": ["yarn install"]
+    }
+  }
+}

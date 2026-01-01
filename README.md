@@ -83,7 +83,7 @@ Run the MCP server on your own computer.
 
 Before you start, make sure you have:
 
-- **Node.js** v18 or higher ([Download here](https://nodejs.org/))
+- **Node.js** v18 or higher (via [Devbox](#option-a-using-devbox-recommended) or [manual install](https://nodejs.org/))
 - **Yarn** package manager ([Installation guide](https://yarnpkg.com/getting-started/install))
 - A **Runalyze account** with premium access ([Get premium](https://runalyze.com/premium))
 - An **AI assistant** that supports MCP (Claude Desktop, ChatGPT Desktop, VS Code extensions, etc.)
@@ -96,7 +96,34 @@ Before you start, make sure you have:
 # Clone the repository
 git clone https://github.com/floriankimmel/runalyze-mcp-server.git
 cd runalyze-mcp-server
+```
 
+#### Option A: Using Devbox (Recommended)
+
+[Devbox](https://www.jetify.com/devbox) provides isolated, reproducible dev environments.
+
+1. Install devbox and direnv:
+   ```bash
+   # macOS
+   brew install devbox direnv
+   ```
+
+2. Enable direnv in the project:
+   ```bash
+   direnv allow
+   ```
+
+3. Run devbox scripts:
+   ```bash
+   devbox run install  # yarn install
+   devbox run build    # yarn build
+   devbox run dev      # yarn start:dev
+   devbox run dev:http # yarn start:http:dev
+   ```
+
+#### Option B: Manual Setup
+
+```bash
 # Install dependencies
 yarn install
 
